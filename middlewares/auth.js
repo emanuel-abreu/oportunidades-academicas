@@ -1,12 +1,21 @@
 const jwt = require("jsonwebtoken");
+
 module.exports = (req, res, next) => {
-  const h = req.headers.authorization;
-  if (!h) return res.status(401).json({ error: "No token" });
-  const [, t] = h.split(" ");
+  const authHeader = req.get("Authorization");
+  if (!authHeader) {
+    return res.status(401).json({ error: "Token não informado" });
+  }
+
+  const [scheme, token] = authHeader.split(" ");
+  if (scheme !== "Bearer" || !token) {
+    return res.status(401).json({ error: "Formato de token inválido" });
+  }
+
   try {
-    req.user = jwt.verify(t, process.env.JWT_SECRET);
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = payload;
     next();
-  } catch (e) {
-    res.status(401).json({ error: "Invalid token" });
+  } catch (err) {
+    return res.status(401).json({ error: "Token inválido ou expirado" });
   }
 };

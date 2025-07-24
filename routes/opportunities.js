@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const auth = require("../middlewares/auth");
-const role = require("../middlewares/auth"); // reuse for role check
+const role = require("../middlewares/auth");
 const { body, query } = require("express-validator");
 const validate = require("../middlewares/validate");
 const ctl = require("../controllers/opportunityController");
@@ -22,12 +22,13 @@ router.post(
   validate,
   ctl.create
 );
+router.get("/favorites", auth, ctl.listFavorites);
+
 router.get("/", auth, ctl.list);
 router.get("/:id", auth, ctl.get);
 router.put("/:id", auth, ctl.update);
 router.delete("/:id", auth, ctl.remove);
 router.post("/:id/favorite", auth, ctl.favorite);
 router.delete("/:id/favorite", auth, ctl.unfavorite);
-router.get("/favorites", auth, ctl.listFavorites);
 
 module.exports = router;

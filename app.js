@@ -3,7 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const logger = require("./utils/logger");
-require("./utils/scheduler"); // inicia cron de backup
+require("./utils/scheduler");
 
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/users");

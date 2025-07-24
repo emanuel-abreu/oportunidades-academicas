@@ -19,6 +19,11 @@ User.init(
     course: DataTypes.STRING,
     semester: DataTypes.INTEGER,
     interests: DataTypes.ARRAY(DataTypes.STRING),
+    emailNotifications: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
+    },
   },
   { sequelize, modelName: "user" }
 );
