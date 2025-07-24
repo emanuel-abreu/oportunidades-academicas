@@ -1,0 +1,39 @@
+{
+  "name": "oportunidades-academicas",
+  "version": "1.0.0",
+  "description": "Trabalho Final – Desenvolvimento de aplicação web com Design Thinking.",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "backup": "node migrations/backup.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/emanuel-abreu/oportunidades-academicas.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/emanuel-abreu/oportunidades-academicas/issues"
+  },
+  "homepage": "https://github.com/emanuel-abreu/oportunidades-academicas#readme",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^4.21.2",
+    "express-validator": "^6.15.0",
+    "jsonwebtoken": "^9.0.2",
+    "node-cron": "^3.0.3",
+    "nodemailer": "^6.10.1",
+    "pg": "^8.16.3",
+    "sequelize": "^6.37.7",
+    "winston": "^3.17.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
