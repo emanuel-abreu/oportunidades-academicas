@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="./assets/css/styles.css" />
+  <title>Favoritos</title>
+</head>
+<body>
+  <header class="topbar">
+    <a href="index.html">Voltar</a>
+    <button id="logoutBtn">Sair</button>
+  </header>
+
+  <main class="container">
+    <h1>Favoritos</h1>
+    <section id="list" class="grid"></section>
+  </main>
+
+  <script type="module">
+    import { ensureAuth, logout } from './assets/js/auth.js'
+    import { getFavorites } from './assets/js/favorites.js'
+
+    ensureAuth('login.html')
+    document.getElementById('logoutBtn').addEventListener('click', logout)
+
+    const list = document.getElementById('list')
+
+    async function render() {
+      const data = await getFavorites()
+      list.innerHTML = data.length ? data.map(o => `
+        <article class="card">
+          <h2>${o.title}</h2>
+          <p class="muted">${o.type} • ${o.area ?? ''}</p>
+          <a class="button" href="opportunity.html?id=${o.id}">Ver detalhes</a>
+        </article>
+      `).join('') : '<p>Nenhum favorito ainda.</p>'
+    }
+
+    render()
+  </script>
+</body>
+</html>

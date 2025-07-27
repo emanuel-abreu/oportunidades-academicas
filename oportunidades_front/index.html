@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="./assets/css/styles.css" />
+  <title>Oportunidades</title>
+</head>
+<body>
+  <header class="topbar">
+    <h1>Oportunidades</h1>
+    <nav>
+      <a href="login.html" id="loginLink">Entrar</a>
+      <a href="profile.html" id="profileLink" class="hidden">Meu Perfil</a>
+      <a href="favorites.html" id="favoritesLink" class="hidden">Favoritos</a>
+      <button id="logoutBtn" class="hidden">Sair</button>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <form id="filterForm" class="filters">
+        <input type="text" id="search" placeholder="Buscar..." />
+        <select id="type">
+          <option value="">Tipo</option>
+          <option value="PIBIC">PIBIC</option>
+          <option value="Extensão">Extensão</option>
+          <option value="Monitoria">Monitoria</option>
+        </select>
+        <input type="text" id="area" placeholder="Área" />
+        <select id="sort">
+          <option value="">Ordenar</option>
+          <option value="publishDate_desc">Mais recentes</option>
+          <option value="deadline_asc">Deadline mais próximo</option>
+        </select>
+        <button type="submit">Filtrar</button>
+      </form>
+    </section>
+
+    <section id="list" class="grid"></section>
+  </main>
+
+  <script type="module">
+    import { mountAuthUI } from './assets/js/auth.js'
+    import { loadOpportunities } from './assets/js/opportunities.js'
+
+    mountAuthUI({
+      loginLink: document.getElementById('loginLink'),
+      profileLink: document.getElementById('profileLink'),
+      favoritesLink: document.getElementById('favoritesLink'),
+      logoutBtn: document.getElementById('logoutBtn')
+    })
+
+    const form = document.getElementById('filterForm')
+    const list = document.getElementById('list')
+
+    function getFilters() {
+      return {
+        search: document.getElementById('search').value,
+        type: document.getElementById('type').value,
+        area: document.getElementById('area').value,
+        sort: document.getElementById('sort').value
+      }
+    }
+
+    async function render() {
+      const data = await loadOpportunities(getFilters())
+      list.innerHTML = data.map(o => `
+        <article class="card">
+          <h2>${o.title}</h2>
+          <p class="muted">${o.type} • ${o.area ?? ''}</p>
+          <p>${(o.description || '').slice(0, 160)}...</p>
+          <a class="button" href="opportunity.html?id=${o.id}">Ver detalhes</a>
+        </article>
+      `).join('')
+    }
+
+    form.addEventListener('submit', e => {
+      e.preventDefault()
+      render()
+    })
+
+    render()
+  </script>
+</body>
+</html>

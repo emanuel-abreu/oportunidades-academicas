@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="./assets/css/styles.css" />
+  <title>Login</title>
+</head>
+<body>
+  <main class="container narrow">
+    <h1>Entrar</h1>
+    <form id="loginForm" class="card">
+      <input type="email" id="email" placeholder="Email" required />
+      <input type="password" id="password" placeholder="Senha" required />
+      <button type="submit">Entrar</button>
+      <p class="muted">Ainda não tem conta? <a href="register.html">Cadastrar</a></p>
+    </form>
+    <p id="error" class="error hidden"></p>
+  </main>
+
+  <script type="module">
+    import { login, redirectIfLogged } from './assets/js/auth.js'
+
+    redirectIfLogged('index.html')
+
+    const form = document.getElementById('loginForm')
+    const error = document.getElementById('error')
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault()
+      const email = document.getElementById('email').value
+      const password = document.getElementById('password').value
+      try {
+        await login({ email, password })
+        window.location.href = 'index.html'
+      } catch (err) {
+        error.textContent = err.message || 'Falha no login'
+        error.classList.remove('hidden')
+      }
+    })
+  </script>
+</body>
+</html>

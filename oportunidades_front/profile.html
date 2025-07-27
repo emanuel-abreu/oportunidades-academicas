@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="./assets/css/styles.css" />
+  <title>Meu perfil</title>
+</head>
+<body>
+  <header class="topbar">
+    <a href="index.html">Voltar</a>
+    <button id="logoutBtn">Sair</button>
+  </header>
+
+  <main class="container narrow">
+    <h1>Meu perfil</h1>
+    <form id="profileForm" class="card">
+      <input type="text" id="name" placeholder="Nome" />
+      <input type="text" id="course" placeholder="Curso" />
+      <input type="text" id="semester" placeholder="Semestre" />
+      <textarea id="interests" placeholder="Interesses (separados por vírgula)"></textarea>
+      <label class="switch">
+        <input type="checkbox" id="emailNotifications" /> Notificações por e-mail
+      </label>
+      <button type="submit">Salvar</button>
+    </form>
+    <p id="msg" class="success hidden"></p>
+  </main>
+
+  <script type="module">
+    import { ensureAuth, logout } from './assets/js/auth.js'
+    import { getProfile, updateProfile, updateNotifications } from './assets/js/profile.js'
+
+    ensureAuth('login.html')
+
+    const form = document.getElementById('profileForm')
+    const msg = document.getElementById('msg')
+    document.getElementById('logoutBtn').addEventListener('click', logout)
+
+    async function render() {
+      const me = await getProfile()
+      document.getElementById('name').value = me.name || ''
+      document.getElementById('course').value = me.course || ''
+      document.getElementById('semester').value = me.semester || ''
+      document.getElementById('interests').value = Array.isArray(me.interests) ? me.interests.join(', ') : (me.interests || '')
+      document.getElementById('emailNotifications').checked = !!me.emailNotifications
+    }
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault()
+      await updateProfile({
+        name: document.getElementById('name').value,
+        course: document.getElementById('course').value,
+        semester: document.getElementById('semester').value,
+        interests: document.getElementById('interests').value.split(',').map(s => s.trim()).filter(Boolean)
+      })
+      await updateNotifications({ emailNotifications: document.getElementById('emailNotifications').checked })
+      msg.textContent = 'Perfil atualizado'
+      msg.classList.remove('hidden')
+    })
+
+    render()
+  </script>
+</body>
+</html>

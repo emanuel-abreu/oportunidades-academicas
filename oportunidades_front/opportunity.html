@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="./assets/css/styles.css" />
+  <title>Oportunidade</title>
+</head>
+<body>
+  <header class="topbar">
+    <a href="index.html">Voltar</a>
+    <nav>
+      <a href="profile.html" id="profileLink" class="hidden">Meu Perfil</a>
+      <a href="favorites.html" id="favoritesLink" class="hidden">Favoritos</a>
+      <button id="logoutBtn" class="hidden">Sair</button>
+    </nav>
+  </header>
+
+  <main class="container" id="container"></main>
+
+  <script type="module">
+    import { mountAuthUI } from './assets/js/auth.js'
+    import { loadOpportunity, toggleFavorite, isFavorite, requireAuthIfAction } from './assets/js/opportunities.js'
+    import { getQueryParam } from './assets/js/utils.js'
+
+    mountAuthUI({
+      profileLink: document.getElementById('profileLink'),
+      favoritesLink: document.getElementById('favoritesLink'),
+      logoutBtn: document.getElementById('logoutBtn')
+    })
+
+    const id = getQueryParam('id')
+    const container = document.getElementById('container')
+
+    async function render() {
+      const o = await loadOpportunity(id)
+      const fav = await isFavorite(id)
+      container.innerHTML = `
+        <section class="card">
+          <h1>${o.title}</h1>
+          <p class="muted">${o.type} • ${o.area ?? ''}</p>
+          <p>${o.description || ''}</p>
+          <div class="actions">
+            <button id="favBtn" class="button ${fav ? 'secondary' : ''}">${fav ? 'Remover dos favoritos' : 'Favoritar'}</button>
+          </div>
+        </section>
+        <aside class="side">
+          <div class="card">
+            <h2>Informações Gerais</h2>
+            <ul>
+              <li><strong>Prazo:</strong> ${o.deadline ? new Date(o.deadline).toLocaleDateString() : '-'}</li>
+              <li><strong>Publicação:</strong> ${o.publishDate ? new Date(o.publishDate).toLocaleDateString() : '-'}</li>
+            </ul>
+          </div>
+        </aside>
+      `
+      document.getElementById('favBtn').addEventListener('click', async () => {
+        await requireAuthIfAction()
+        await toggleFavorite(id, fav)
+        render()
+      })
+    }
+
+    render()
+  </script>
+</body>
+</html>
