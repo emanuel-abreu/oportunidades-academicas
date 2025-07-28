@@ -1,4 +1,4 @@
-const BASE_URL = "https://oportunidades-academicas.onrender.com";
+const BASE_URL = "https://oportunidades-academicas.onrender.com/api";
 
 function getToken() {
   return localStorage.getItem("token");
