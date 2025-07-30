@@ -1,43 +1,69 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="./assets/css/styles.css" />
-  <title>Favoritos</title>
-</head>
-<body>
-  <header class="topbar">
-    <a href="index.html">Voltar</a>
-    <button id="logoutBtn">Sair</button>
-  </header>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="./assets/css/styles.css" />
+    <title>Favoritos</title>
+  </head>
+  <body>
+    <header class="topbar">
+      <a href="index.html">Voltar</a>
+      <button id="logoutBtn">Sair</button>
+    </header>
 
-  <main class="container">
-    <h1>Favoritos</h1>
-    <section id="list" class="grid"></section>
-  </main>
+    <main class="container">
+      <h1>Favoritos</h1>
+      <section id="list" class="grid"></section>
+    </main>
 
-  <script type="module">
-    import { ensureAuth, logout } from './assets/js/auth.js'
-    import { getFavorites } from './assets/js/favorites.js'
+    <script type="module">
+      import { ensureAuth, logout } from "./assets/js/auth.js";
+      import { getFavorites, removeFavorite } from "./assets/js/favorites.js";
 
-    ensureAuth('login.html')
-    document.getElementById('logoutBtn').addEventListener('click', logout)
+      ensureAuth("login.html");
+      document.getElementById("logoutBtn").addEventListener("click", logout);
 
-    const list = document.getElementById('list')
+      const list = document.getElementById("list");
 
-    async function render() {
-      const data = await getFavorites()
-      list.innerHTML = data.length ? data.map(o => `
-        <article class="card">
-          <h2>${o.title}</h2>
-          <p class="muted">${o.type} • ${o.area ?? ''}</p>
-          <a class="button" href="opportunity.html?id=${o.id}">Ver detalhes</a>
-        </article>
-      `).join('') : '<p>Nenhum favorito ainda.</p>'
-    }
+      async function render() {
+        const data = await getFavorites();
 
-    render()
-  </script>
-</body>
+        list.innerHTML = data.length
+          ? data
+              .map(
+                (o) => `
+          <!-- agora com data-id -->
+          <article class="card" data-id="${o.id}">
+            <h2>${o.title}</h2>
+            <p class="muted">${o.type} • ${o.area ?? ""}</p>
+            <a class="button" href="opportunity.html?id=${
+              o.id
+            }">Ver detalhes</a>
+            <button class="button danger desfav-btn">Desfavoritar</button>
+          </article>
+        `
+              )
+              .join("")
+          : "<p>Nenhum favorito ainda.</p>";
+
+        document.querySelectorAll(".desfav-btn").forEach((btn) => {
+          btn.addEventListener("click", async (e) => {
+            const article = e.target.closest("article");
+            const id = article.dataset.id;
+
+            try {
+              await removeFavorite(id);
+              article.remove();
+            } catch (err) {
+              console.error("Erro ao desfavoritar:", err);
+              alert("Erro ao desfavoritar. Tente novamente.");
+            }
+          });
+        });
+      }
+
+      render();
+    </script>
+  </body>
 </html>

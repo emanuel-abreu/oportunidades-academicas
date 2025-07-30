@@ -1,67 +1,103 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="./assets/css/styles.css" />
-  <title>Oportunidade</title>
-</head>
-<body>
-  <header class="topbar">
-    <a href="index.html">Voltar</a>
-    <nav>
-      <a href="profile.html" id="profileLink" class="hidden">Meu Perfil</a>
-      <a href="favorites.html" id="favoritesLink" class="hidden">Favoritos</a>
-      <button id="logoutBtn" class="hidden">Sair</button>
-    </nav>
-  </header>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="./assets/css/styles.css" />
+    <title>Oportunidade</title>
+  </head>
+  <body>
+    <header class="topbar">
+      <a href="index.html">Voltar</a>
+      <nav>
+        <a href="profile.html" id="profileLink" class="hidden">Meu Perfil</a>
+        <a href="favorites.html" id="favoritesLink" class="hidden">Favoritos</a>
+        <button id="logoutBtn" class="hidden">Sair</button>
+      </nav>
+    </header>
 
-  <main class="container" id="container"></main>
+    <main class="container" id="container"></main>
 
-  <script type="module">
-    import { mountAuthUI } from './assets/js/auth.js'
-    import { loadOpportunity, toggleFavorite, isFavorite, requireAuthIfAction } from './assets/js/opportunities.js'
-    import { getQueryParam } from './assets/js/utils.js'
+    <script type="module">
+      import { mountAuthUI } from "./assets/js/auth.js";
+      import {
+        loadOpportunity,
+        toggleFavorite,
+        isFavorite,
+        deleteOpportunity,
+        requireAuthIfAction,
+      } from "./assets/js/opportunities.js";
+      import { getQueryParam } from "./assets/js/utils.js";
 
-    mountAuthUI({
-      profileLink: document.getElementById('profileLink'),
-      favoritesLink: document.getElementById('favoritesLink'),
-      logoutBtn: document.getElementById('logoutBtn')
-    })
+      mountAuthUI({
+        profileLink: document.getElementById("profileLink"),
+        favoritesLink: document.getElementById("favoritesLink"),
+        logoutBtn: document.getElementById("logoutBtn"),
+      });
 
-    const id = getQueryParam('id')
-    const container = document.getElementById('container')
+      const id = getQueryParam("id");
+      const container = document.getElementById("container");
 
-    async function render() {
-      const o = await loadOpportunity(id)
-      const fav = await isFavorite(id)
-      container.innerHTML = `
-        <section class="card">
+      async function render() {
+        const o = await loadOpportunity(id);
+        const fav = await isFavorite(id);
+
+        container.innerHTML = `
+        <section class="card" id="oppCard">
           <h1>${o.title}</h1>
-          <p class="muted">${o.type} • ${o.area ?? ''}</p>
-          <p>${o.description || ''}</p>
+          <p class="muted">${o.type} • ${o.area ?? ""}</p>
+          <p>${o.description || ""}</p>
           <div class="actions">
-            <button id="favBtn" class="button ${fav ? 'secondary' : ''}">${fav ? 'Remover dos favoritos' : 'Favoritar'}</button>
+            <button id="favBtn" class="button ${fav ? "secondary" : ""}">
+              ${fav ? "Remover dos favoritos" : "Favoritar"}
+            </button>
+            <button id="deleteBtn" class="button danger">Excluir</button>
           </div>
         </section>
         <aside class="side">
-          <div class="card">
-            <h2>Informações Gerais</h2>
-            <ul>
-              <li><strong>Prazo:</strong> ${o.deadline ? new Date(o.deadline).toLocaleDateString() : '-'}</li>
-              <li><strong>Publicação:</strong> ${o.publishDate ? new Date(o.publishDate).toLocaleDateString() : '-'}</li>
-            </ul>
-          </div>
+          <!-- informações gerais... -->
         </aside>
-      `
-      document.getElementById('favBtn').addEventListener('click', async () => {
-        await requireAuthIfAction()
-        await toggleFavorite(id, fav)
-        render()
-      })
-    }
+      `;
 
-    render()
-  </script>
-</body>
+        document
+          .getElementById("favBtn")
+          .addEventListener("click", async () => {
+            await requireAuthIfAction();
+            await toggleFavorite(id, fav);
+            render();
+          });
+
+        document
+          .getElementById("deleteBtn")
+          .addEventListener("click", async () => {
+            await requireAuthIfAction();
+            if (!confirm("Tem certeza que deseja excluir esta oportunidade?"))
+              return;
+
+            try {
+              await deleteOpportunity(id);
+
+              // remove o cartão e exibe mensagem
+              const card = document.getElementById("oppCard");
+              card.innerHTML = `
+              <h2>Oportunidade excluída</h2>
+              <p>Esta oportunidade foi removida com sucesso.</p>
+              <button id="backBtn" class="button">Voltar à lista</button>
+            `;
+              document
+                .getElementById("backBtn")
+                .addEventListener(
+                  "click",
+                  () => (window.location.href = "index.html")
+                );
+            } catch (err) {
+              console.error(err);
+              alert("Não foi possível excluir: " + err.message);
+            }
+          });
+      }
+
+      render();
+    </script>
+  </body>
 </html>

@@ -24,8 +24,8 @@ router.post(
 );
 router.get("/favorites", auth, ctl.listFavorites);
 
-router.get("/", auth, ctl.list);
-router.get("/:id", auth, ctl.get);
+router.get("/", ctl.list);
+router.get("/:id", ctl.get);
 router.put("/:id", auth, ctl.update);
 router.delete("/:id", auth, ctl.remove);
 router.post("/:id/favorite", auth, ctl.favorite);

@@ -10,7 +10,7 @@ const userRoutes = require("./routes/users");
 const oppRoutes = require("./routes/opportunities");
 
 const app = express();
-app.use(cors());
+app.use(cors({ origin: "*" }));
 app.use(bodyParser.json());
 
 app.use("/api/auth", authRoutes);
